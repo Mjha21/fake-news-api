@@ -3,23 +3,20 @@ import joblib
 
 app = Flask(__name__)
 
-# Load trained model and vectorizer
-model = joblib.load('model.pkl')
-vectorizer = joblib.load('vectorizer.pkl')
+# Example root route (optional but helpful)
+@app.route('/')
+def home():
+    return "Fake News Detection API is Live!"
 
+# Main prediction route
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
-    news_text = data.get('text', '')
-    
-    if news_text.strip() == "":
-        return jsonify({'error': 'Empty input'})
-
-    # Transform and predict
-    vector = vectorizer.transform([news_text])
-    prediction = model.predict(vector)
-    
+    text = data['text']
+    model = joblib.load('model.pkl')
+    vectorizer = joblib.load('vectorizer.pkl')
+    prediction = model.predict(vectorizer.transform([text]))
     return jsonify({'prediction': prediction[0]})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
